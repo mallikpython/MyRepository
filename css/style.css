@@ -220,6 +220,31 @@ canvas {
   max-width: 100%;
 }
 
+.hint {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+}
+
+.person-row {
+  cursor: pointer;
+}
+
+.person-row:hover {
+  background-color: #f0f4fb;
+}
+
+.person-row.selected {
+  background-color: #e3ecf9;
+}
+
+.history-controls select {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
 .app-footer {
   text-align: center;
   padding: 1.5rem;
