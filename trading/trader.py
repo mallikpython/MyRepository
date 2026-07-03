@@ -38,7 +38,13 @@ def login():
         raise EnvironmentError(
             "Set ROBINHOOD_USERNAME and ROBINHOOD_PASSWORD environment variables."
         )
-    rh.login(username, password, expiresIn=86400, store_session=False)
+
+    result = rh.login(username, password, expiresIn=86400, store_session=False)
+    if not result or not result.get("access_token"):
+        raise RuntimeError(
+            f"Robinhood login failed: {result.get('detail') if isinstance(result, dict) else result}. "
+            "Aborting instead of continuing unauthenticated."
+        )
     log.info("Logged in to Robinhood")
 
 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friends &amp; Family | Mallik Rasala</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Mallik Rasala</h1>
+    <p class="subtitle">Friends &amp; Family Transactions</p>
+    <nav class="app-nav">
+      <a href="index.html">Dashboard</a>
+      <a href="friends.html" class="active">Friends &amp; Family</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="summary">
+      <div class="card expense">
+        <h2>Total Given</h2>
+        <p id="total-given">$0.00</p>
+      </div>
+      <div class="card income">
+        <h2>Total Received Back</h2>
+        <p id="total-received">$0.00</p>
+      </div>
+      <div class="card balance">
+        <h2>Outstanding</h2>
+        <p id="outstanding">$0.00</p>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Add Transaction</h2>
+      <form id="friend-form">
+        <div class="form-row">
+          <input type="text" id="person" placeholder="Person's name" required />
+          <input type="number" id="amount" placeholder="Amount" step="0.01" min="0.01" required />
+        </div>
+        <div class="form-row">
+          <select id="direction">
+            <option value="given">Given to them</option>
+            <option value="received">Received back</option>
+          </select>
+          <select id="medium">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Zelle">Zelle</option>
+            <option value="Venmo">Venmo</option>
+            <option value="PayPal">PayPal</option>
+            <option value="Check">Check</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-row">
+          <input type="text" id="note" placeholder="Note (optional, e.g. reason)" />
+        </div>
+        <button type="submit">Add Transaction</button>
+      </form>
+    </section>
+
+    <section class="breakdown-section">
+      <h2>Outstanding by Person</h2>
+      <table id="person-table">
+        <thead>
+          <tr>
+            <th>Person</th>
+            <th>Given</th>
+            <th>Received Back</th>
+            <th>Outstanding</th>
+          </tr>
+        </thead>
+        <tbody id="person-summary"></tbody>
+      </table>
+    </section>
+
+    <section class="history-section">
+      <h2>Transaction History</h2>
+      <div class="history-controls">
+        <button id="export-btn">Export CSV</button>
+        <button id="clear-btn">Clear All</button>
+      </div>
+      <table id="friend-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Person</th>
+            <th>Direction</th>
+            <th>Medium</th>
+            <th>Note</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="friend-list"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Mallik Rasala &mdash; Data is stored locally in your browser</p>
+  </footer>
+
+  <script src="js/friends.js"></script>
+</body>
+</html>
