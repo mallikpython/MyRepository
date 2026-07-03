@@ -28,4 +28,9 @@ STOP_LOSS_PCT = 2.0            # Close spread at 2x credit received (200% loss)
 
 # ── Account / Symbol ──────────────────────────────────────────────────────────
 SYMBOL = "QQQ"
-LOG_FILE = "trading/trade_log.csv"
+
+# Paths anchored to this directory so the trader works from any working directory
+import os
+_HERE = os.path.dirname(os.path.abspath(__file__))
+LOG_FILE = os.path.join(_HERE, "trade_log.csv")
+APP_LOG_FILE = os.path.join(_HERE, "trader.log")
