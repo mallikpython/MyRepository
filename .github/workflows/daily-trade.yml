@@ -1,0 +1,47 @@
+name: Daily QQQ Options Trade
+
+on:
+  schedule:
+    # 9:45 AM ET = 13:45 UTC during EDT (Mar–Nov). Adjust to 14:45 UTC in winter (EST).
+    - cron: "45 13 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      live:
+        description: "Set to 'yes' to place REAL orders (default is dry-run)"
+        required: false
+        default: "no"
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r trading/requirements.txt
+
+      - name: Run trader
+        working-directory: trading
+        env:
+          ROBINHOOD_USERNAME: ${{ secrets.ROBINHOOD_USERNAME }}
+          ROBINHOOD_PASSWORD: ${{ secrets.ROBINHOOD_PASSWORD }}
+        run: |
+          if [ "${{ github.event.inputs.live }}" = "yes" ] && [ -n "$ROBINHOOD_USERNAME" ]; then
+            python trader.py
+          else
+            python trader.py --dry-run
+          fi
+
+      - name: Upload trade log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trade-log-${{ github.run_id }}
+          path: |
+            trading/trade_log.csv
+            trading/trader.log
+          if-no-files-found: ignore

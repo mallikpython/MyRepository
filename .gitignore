@@ -1,0 +1,6 @@
+trading/.env
+trading/venv/
+trading/__pycache__/
+trading/*.log
+trading/trade_log.csv
+*.pyc
