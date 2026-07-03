@@ -30,7 +30,6 @@ jobs:
         env:
           ROBINHOOD_USERNAME: ${{ secrets.ROBINHOOD_USERNAME || vars.ROBINHOOD_USERNAME }}
           ROBINHOOD_PASSWORD: ${{ secrets.ROBINHOOD_PASSWORD || vars.ROBINHOOD_PASSWORD }}
-          ROBINHOOD_TOTP_SECRET: ${{ secrets.ROBINHOOD_TOTP_SECRET }}
         run: |
           if [ "${{ github.event.inputs.live }}" = "yes" ] && [ -n "$ROBINHOOD_USERNAME" ]; then
             python trader.py
