@@ -14,8 +14,11 @@ const totalReceivedEl = document.getElementById('total-received');
 const outstandingEl = document.getElementById('outstanding');
 const exportBtn = document.getElementById('export-btn');
 const clearBtn = document.getElementById('clear-btn');
+const personFilter = document.getElementById('person-filter');
+const historyTitle = document.getElementById('history-title');
 
 let transactions = loadTransactions();
+let selectedPerson = '';
 
 dateInput.valueAsDate = new Date();
 
@@ -41,7 +44,18 @@ function escapeHtml(text) {
 function render() {
   friendList.innerHTML = '';
 
-  const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (selectedPerson && !transactions.some((t) => t.person === selectedPerson)) {
+    selectedPerson = '';
+  }
+
+  const visible = selectedPerson
+    ? transactions.filter((t) => t.person === selectedPerson)
+    : transactions;
+  const sorted = [...visible].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  historyTitle.textContent = selectedPerson
+    ? `Transaction History — ${selectedPerson}`
+    : 'Transaction History';
 
   sorted.forEach((t) => {
     const row = document.createElement('tr');
@@ -78,30 +92,47 @@ function renderPersonSummary() {
   const byPerson = {};
   transactions.forEach((t) => {
     if (!byPerson[t.person]) {
-      byPerson[t.person] = { given: 0, received: 0 };
+      byPerson[t.person] = { given: 0, received: 0, count: 0, lastDate: '' };
     }
-    byPerson[t.person][t.direction === 'given' ? 'given' : 'received'] += t.amount;
+    const p = byPerson[t.person];
+    p[t.direction === 'given' ? 'given' : 'received'] += t.amount;
+    p.count += 1;
+    if (t.date > p.lastDate) p.lastDate = t.date;
   });
 
   personSummary.innerHTML = '';
-  Object.keys(byPerson)
-    .sort((a, b) => {
-      const outA = byPerson[a].given - byPerson[a].received;
-      const outB = byPerson[b].given - byPerson[b].received;
-      return outB - outA;
-    })
-    .forEach((person) => {
-      const { given, received } = byPerson[person];
-      const outstanding = given - received;
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${escapeHtml(person)}</td>
-        <td class="amount-expense">${formatCurrency(given)}</td>
-        <td class="amount-income">${formatCurrency(received)}</td>
-        <td class="${outstanding > 0 ? 'amount-expense' : 'amount-income'}">${formatCurrency(outstanding)}</td>
-      `;
-      personSummary.appendChild(row);
-    });
+  const people = Object.keys(byPerson).sort((a, b) => {
+    const outA = byPerson[a].given - byPerson[a].received;
+    const outB = byPerson[b].given - byPerson[b].received;
+    return outB - outA;
+  });
+
+  people.forEach((person) => {
+    const { given, received, count, lastDate } = byPerson[person];
+    const outstanding = given - received;
+    const row = document.createElement('tr');
+    row.className = 'person-row' + (person === selectedPerson ? ' selected' : '');
+    row.dataset.person = person;
+    row.innerHTML = `
+      <td>${escapeHtml(person)}</td>
+      <td>${count}</td>
+      <td class="amount-expense">${formatCurrency(given)}</td>
+      <td class="amount-income">${formatCurrency(received)}</td>
+      <td class="${outstanding > 0 ? 'amount-expense' : 'amount-income'}">${formatCurrency(outstanding)}</td>
+      <td>${lastDate}</td>
+    `;
+    personSummary.appendChild(row);
+  });
+
+  // Rebuild the person filter dropdown, preserving selection
+  personFilter.innerHTML = '<option value="">All people</option>';
+  people.forEach((person) => {
+    const opt = document.createElement('option');
+    opt.value = person;
+    opt.textContent = person;
+    if (person === selectedPerson) opt.selected = true;
+    personFilter.appendChild(opt);
+  });
 }
 
 form.addEventListener('submit', (e) => {
@@ -136,6 +167,18 @@ friendList.addEventListener('click', (e) => {
     saveTransactions();
     render();
   }
+});
+
+personSummary.addEventListener('click', (e) => {
+  const row = e.target.closest('.person-row');
+  if (!row) return;
+  selectedPerson = selectedPerson === row.dataset.person ? '' : row.dataset.person;
+  render();
+});
+
+personFilter.addEventListener('change', () => {
+  selectedPerson = personFilter.value;
+  render();
 });
 
 clearBtn.addEventListener('click', () => {

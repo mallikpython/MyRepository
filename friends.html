@@ -64,14 +64,17 @@
     </section>
 
     <section class="breakdown-section">
-      <h2>Outstanding by Person</h2>
+      <h2>Person-wise Details</h2>
+      <p class="hint">Click a person to see all their transactions below.</p>
       <table id="person-table">
         <thead>
           <tr>
             <th>Person</th>
+            <th>Transactions</th>
             <th>Given</th>
             <th>Received Back</th>
             <th>Outstanding</th>
+            <th>Last Activity</th>
           </tr>
         </thead>
         <tbody id="person-summary"></tbody>
@@ -79,8 +82,11 @@
     </section>
 
     <section class="history-section">
-      <h2>Transaction History</h2>
+      <h2 id="history-title">Transaction History</h2>
       <div class="history-controls">
+        <select id="person-filter">
+          <option value="">All people</option>
+        </select>
         <button id="export-btn">Export CSV</button>
         <button id="clear-btn">Clear All</button>
       </div>
