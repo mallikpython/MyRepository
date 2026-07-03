@@ -27,8 +27,8 @@ jobs:
       - name: Run trader
         working-directory: trading
         env:
-          ROBINHOOD_USERNAME: ${{ secrets.ROBINHOOD_USERNAME }}
-          ROBINHOOD_PASSWORD: ${{ secrets.ROBINHOOD_PASSWORD }}
+          ROBINHOOD_USERNAME: ${{ secrets.ROBINHOOD_USERNAME || vars.ROBINHOOD_USERNAME }}
+          ROBINHOOD_PASSWORD: ${{ secrets.ROBINHOOD_PASSWORD || vars.ROBINHOOD_PASSWORD }}
         run: |
           if [ "${{ github.event.inputs.live }}" = "yes" ] && [ -n "$ROBINHOOD_USERNAME" ]; then
             python trader.py

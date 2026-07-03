@@ -19,14 +19,14 @@ import pandas as pd
 
 from config import (
     SYMBOL, MAX_RISK_PER_TRADE, MAX_DAILY_LOSS,
-    PROFIT_TARGET_PCT, STOP_LOSS_PCT, LOG_FILE,
+    PROFIT_TARGET_PCT, STOP_LOSS_PCT, LOG_FILE, APP_LOG_FILE,
 )
 from strategy import determine_direction, select_spread
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("trading/trader.log")],
+    handlers=[logging.StreamHandler(), logging.FileHandler(APP_LOG_FILE)],
 )
 log = logging.getLogger(__name__)
 
@@ -174,7 +174,16 @@ def main():
         login()
 
     # ── Fetch data ─────────────────────────────────────────────────────────────
-    prices = get_historical_prices(SYMBOL)
+    try:
+        prices = get_historical_prices(SYMBOL)
+    except Exception as e:
+        if not args.dry_run:
+            raise
+        log.warning(f"[DRY RUN] Price fetch failed ({e.__class__.__name__}); using mock price data")
+        prices = [480 + i * 0.7 for i in range(50)] + [
+            515, 514.2, 515.1, 514.5, 515.3, 514.4, 515.6,
+            514.8, 515.2, 514.6, 515.5, 514.9, 515.8, 515.0,
+        ]
     current_price = prices[-1]
     log.info(f"{SYMBOL} current price: ${current_price:.2f}")
 
