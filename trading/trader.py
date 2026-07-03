@@ -34,11 +34,32 @@ log = logging.getLogger(__name__)
 def login():
     username = os.environ.get("ROBINHOOD_USERNAME")
     password = os.environ.get("ROBINHOOD_PASSWORD")
+    totp_secret = os.environ.get("ROBINHOOD_TOTP_SECRET")
     if not username or not password:
         raise EnvironmentError(
             "Set ROBINHOOD_USERNAME and ROBINHOOD_PASSWORD environment variables."
         )
-    rh.login(username, password, expiresIn=86400, store_session=False)
+
+    mfa_code = None
+    if totp_secret:
+        import pyotp
+        mfa_code = pyotp.TOTP(totp_secret.replace(" ", "")).now()
+        log.info("Generated TOTP code for MFA")
+    else:
+        log.warning(
+            "ROBINHOOD_TOTP_SECRET not set. If your account uses device-approval "
+            "2FA, headless login will fail. Enable 'Authenticator app' 2FA in the "
+            "Robinhood app and store its secret key as ROBINHOOD_TOTP_SECRET."
+        )
+
+    result = rh.login(
+        username, password, expiresIn=86400, store_session=False, mfa_code=mfa_code
+    )
+    if not result or not result.get("access_token"):
+        raise RuntimeError(
+            f"Robinhood login failed: {result.get('detail') if isinstance(result, dict) else result}. "
+            "Aborting instead of continuing unauthenticated."
+        )
     log.info("Logged in to Robinhood")
 
 
